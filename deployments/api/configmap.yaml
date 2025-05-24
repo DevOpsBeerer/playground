@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+  namespace: devopsbeerer-api
+data:
+  KEYCLOAK_URL: http://sso-keycloak-headless.sso.svc.cluster.local:8080
+  KEYCLOAK_AUDIENCE: devopsbeerer-api
+  KEYCLOAK_REALM: devopsbeerer
+  NODE_ENV: development

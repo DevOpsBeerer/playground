@@ -1,0 +1,7 @@
+# values.yaml
+controller:
+  service:
+    type: LoadBalancer
+  progressDeadlineSeconds: 600
+  config:
+    use-forwarded-headers: "true"

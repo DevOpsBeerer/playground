@@ -1,0 +1,237 @@
+# values-devopsbeerer.yaml
+# Keycloak Configuration for devopsbeerer playground
+
+# Basic Auth Configuration
+auth:
+  adminUser: admin
+  adminPassword: "devopsbeerer123"
+
+# Production-like setup but simplified for playground
+production: false
+proxy: "edge" # For k3s ingress
+httpRelativePath: "/"
+
+# Enable ingress for easy access
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostname: sso.devopsbeerer.local
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: "ca-cluster-issuer"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+# PostgreSQL configuration (built-in)
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres123"
+    username: "keycloak"
+    password: "keycloak123"
+    database: "keycloak"
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Enable automatic realm/client configuration
+keycloakConfigCli:
+  enabled: true
+  configuration:
+    # devopsbeerer realm configuration
+    devopsbeerer-realm.yaml: |
+      realm: devopsbeerer
+      displayName: "DevOps Beerer - OAuth2/OIDC Playground"
+      enabled: true
+      registrationAllowed: false
+      loginWithEmailAllowed: true
+      duplicateEmailsAllowed: false
+      resetPasswordAllowed: true
+      editUsernameAllowed: false
+      bruteForceProtected: true
+      roles:
+        realm: []  # Keep existing realm roles empty or add them here
+        client:
+          devopsbeerer-api:
+            - name: "admin"
+              description: "Full API administrative access"
+              composite: false
+              clientRole: true
+            - name: "user"
+              description: "Manage beer inventory and recipes"
+              composite: false
+              clientRole: true
+
+      # Define some demo users
+      users:
+        - username: "brewmaster"
+          email: "brewmaster@devopsbeerer.local"
+          firstName: "Brew"
+          lastName: "Master"
+          enabled: true
+          credentials:
+            - type: "password"
+              value: "beer123"
+              temporary: false
+          clientRoles:
+            devopsbeerer-api:
+              - "admin"
+        - username: "customer"
+          email: "customer@devopsbeerer.local"
+          firstName: "Beer"
+          lastName: "Lover"
+          enabled: true
+          credentials:
+            - type: "password"
+              value: "beer123"
+              temporary: false
+          clientRoles:
+            devopsbeerer-api:
+              - "user"
+
+      # OAuth2/OIDC Clients for different scenarios
+      clients:
+        # Frontend SPA (React/Vue/Angular)
+        - clientId: "devopsbeerer-frontoffice"
+          name: "Beer Frontend (SPA)"
+          description: "Public client for Single Page Applications"
+          protocol: "openid-connect"
+          publicClient: true
+          standardFlowEnabled: true
+          implicitFlowEnabled: false
+          directAccessGrantsEnabled: false
+          serviceAccountsEnabled: false
+          redirectUris:
+            - "https://app.devopsbeerer.local/callback"
+            - "http://localhost:4200/callback"
+          webOrigins:
+            - "https://app.devopsbeerer.local"
+            - "https://app.devopsbeerer.local/*"
+            - "http://localhost:4200"
+            - "http://localhost:4200/*"
+          attributes:
+            "pkce.code.challenge.method": "S256"
+          defaultClientScopes:
+            - Beers.Read
+            - Beers.Read.All
+            - web-origins
+            - acr
+            - roles
+            - profile
+            - basic
+            - email
+        
+        # Backend API (Confidential)
+        - clientId: "devopsbeerer-api"
+          name: "Beer API"
+          description: "Confidential client for backend API"
+          protocol: "openid-connect"
+          publicClient: false
+          standardFlowEnabled: true
+          directAccessGrantsEnabled: true
+          serviceAccountsEnabled: true
+          secret: "beer-api-secret-123"
+          protocolMappers:
+            - name: "audience-mapper"
+              protocol: "openid-connect"
+              protocolMapper: "oidc-audience-mapper"
+              config:
+                "included.client.audience": "devopsbeerer-api"
+                "access.token.claim": "true"
+            - name: "client-roles-mapper"
+              protocol: "openid-connect"
+              protocolMapper: "oidc-usermodel-client-role-mapper"
+              config:
+                "usermodel.clientRoleMapping.clientId": "devopsbeerer-api"
+                "claim.name": "resource_access.devopsbeerer-api.roles"
+                "jsonType.label": "String"
+                "multivalued": "true"
+                "access.token.claim": "true"
+                "id.token.claim": "true"
+        
+        # CLI/Postman client for testing
+        - clientId: "beer-cli"
+          name: "Beer CLI/Testing"
+          description: "Client for CLI tools and testing (Postman, curl, etc.)"
+          protocol: "openid-connect"
+          publicClient: true
+          standardFlowEnabled: false
+          implicitFlowEnabled: false
+          directAccessGrantsEnabled: true
+          serviceAccountsEnabled: false
+
+      # Client Scopes for fine-grained access
+      clientScopes:
+        - name: "Beers.Read"
+          description: "Read beer information"
+          protocol: "openid-connect"
+          attributes:
+            "consent.screen.text": "Access to read beer information"
+            "display.on.consent.screen": "true"
+        - name: "Beers.Read.All"
+          description: "Read all beer"
+          protocol: "openid-connect"
+          attributes:
+            "consent.screen.text": "Access to read all beer information"
+            "display.on.consent.screen": "true"
+        - name: "Beers.Write"
+          description: "Create and modify beers"
+          protocol: "openid-connect"
+          attributes:
+            "consent.screen.text": "Access to create and modify beers"
+            "display.on.consent.screen": "true"
+
+# Resource limits appropriate for playground
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Enable metrics for monitoring examples
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: false # Enable if you have Prometheus operator
+
+# Logging configuration
+logging:
+  level: INFO
+  output: default
+
+# Cache configuration for clustering examples
+cache:
+  enabled: true
+  stack: kubernetes
+
+# Network policy for security demonstrations
+networkPolicy:
+  enabled: true
+  allowExternal: true
+
+# Service account for RBAC examples
+serviceAccount:
+  create: true
+  name: "keycloak-devopsbeerer"
+
+# Additional environment variables for demo purposes
+extraEnvVars:
+  - name: KEYCLOAK_LOGLEVEL
+    value: INFO
+  - name: KC_FEATURES
+    value: "token-exchange,admin-fine-grained-authz"
+  - name: KC_HOSTNAME_STRICT
+    value: "false"
+  - name: KC_HOSTNAME_STRICT_HTTPS
+    value: "false"
+  - name: KC_HTTP_ENABLED
+    value: "true"
+  - name: KC_PROXY
+    value: "edge" # Important for ingress
+  - name: KC_HOSTNAME_URL
+    value: "https://sso.devopsbeerer.local" # External URL
+  - name: KC_HOSTNAME_ADMIN_URL
+    value: "https://sso.devopsbeerer.local" # External admin URL

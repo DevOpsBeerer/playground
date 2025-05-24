@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: devopsbeerer-frontoffice
+  name: devopsbeerer-frontoffice
+  namespace: devopsbeerer-frontoffice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devopsbeerer-frontoffice
+  template:
+    metadata:
+      labels:
+        app: devopsbeerer-frontoffice
+    spec:
+      dnsPolicy: ClusterFirst
+      containers:
+        - image: rg.fr-par.scw.cloud/devopsbeerer/frontoffice:1.0.0
+          name: frontoffice
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "125m"
+            limits:
+              memory: "64Mi"
+              cpu: "250m"
+          volumeMounts:
+            - name: config
+              mountPath: "/usr/share/nginx/html/config.json"
+              subPath: "config.json"
+              readOnly: true
+            - name: config
+              mountPath: "/usr/share/nginx/html/auth.json"
+              subPath: "auth.json"
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: config
+            items:
+              - key: "config.json"
+                path: "config.json"
+              - key: "auth.json"
+                path: "auth.json"
