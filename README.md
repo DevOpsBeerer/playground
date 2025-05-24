@@ -52,8 +52,8 @@ The playground consists of several components working together:
 1. **Clone the repository**
 
    ```bash
-   git clone <your-repo-url>
-   cd devopsbeerer-playground
+   git clone https://github.com/DevOpsBeerer/playground.git
+   cd playground
    ```
 
 2. **Install K3s and base infrastructure**
@@ -100,7 +100,7 @@ Once deployed, you can access:
 
 ## 📁 Project Structure
 
-```
+```text
 devopsbeerer-playground/
 ├── install-k3s.sh              # K3s installation script
 ├── init-k3s.sh                 # Infrastructure initialization
