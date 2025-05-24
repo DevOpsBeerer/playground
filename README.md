@@ -21,7 +21,7 @@ The playground consists of several components working together:
 
 - **Beer API**: RESTful API for managing beer inventory (CRUD operations)
 - **Frontoffice**: Public-facing web application for beer browsing
-- **Backoffice**: Administrative interface for beer management (comming soon)
+- **Backoffice**: Administrative interface for beer management  (comming soon)
 - **Future Extensions**: Additional scenarios and integrations
 
 ### Infrastructure
@@ -35,7 +35,7 @@ The playground consists of several components working together:
 
 - Authorization Code Flow
 - Client Credentials Flow (comming soon)
-- Device Authorization Flow  (comming soon)
+- Device Authorization Flow (comming soon)
 - Token introspection and validation (comming soon)
 
 ## 🚀 Quick Start
@@ -87,37 +87,60 @@ sudo k3s kubectl get pods --all-namespaces
 sudo k3s kubectl get ingress --all-namespaces
 ```
 
+### Configure DNS Records
+
+Before accessing the playground, you need to set up local DNS records:
+
+```bash
+# Generate DNS records for your environment
+chmod +x get-dns-records.sh
+sudo ./get-dns-records.sh
+```
+
+The script will provide you with DNS records to copy into your `/etc/hosts` file (Linux/Mac) or `C:\Windows\System32\drivers\etc\hosts` (Windows). Choose the format that matches your system and copy the provided records.
+
 ### Access the Playground
 
-Once deployed, you can access:
+Once DNS is configured, you can access:
 
 - **Keycloak Admin Console**: `https://sso.devopsbeerer.local/admin`
 - **Beer API**: `https://api.devopsbeerer.local`
 - **Frontoffice**: `https://devopsbeerer.local`
-- **Backoffice**: `https://admin.devopsbeerer.local`
+- **Backoffice**: `https://admin.devopsbeerer.local` (comming soon)
 
-*Note: Add these domains to your `/etc/hosts` file pointing to your server's IP address.*
+⚠️ **SSL Certificate Warning**: The playground uses self-signed certificates. Your browser will show security warnings - this is normal for local development. Click "Advanced" and "Proceed to site" to continue.
+
+### Demo Users
+
+The playground comes with pre-configured demo users:
+
+| Username | Password | Role | Description |
+|----------|----------|------|-------------|
+| `brewmaster` | `beer123` | admin | Full administrative access to all applications |
+| `customer` | `beer123` | user | Standard user access for frontoffice |
+
+**Keycloak Admin Access:**
+
+- Username: `admin`
+- Password: `admin123`
 
 ## 📁 Project Structure
 
-```text
+```
 devopsbeerer-playground/
 ├── install-k3s.sh              # K3s installation script
 ├── init-k3s.sh                 # Infrastructure initialization
 ├── init-app.sh                 # Application deployment
+├── get-dns-records.sh           # DNS records generator script
 ├── deployments/                # Kubernetes manifests for applications
 │   ├── api/                    # Beer API deployment files
 │   ├── frontoffice/            # Public web app deployment
-│   └── backoffice/             # Admin interface deployment
+│   └── backoffice/             # Admin interface deployment  (comming soon)
 ├── k3s/                        # Infrastructure configuration
 │   ├── config.yaml             # K3s server configuration
 │   ├── ingress-controller.yaml # Nginx ingress settings
 │   ├── cert-manager.yaml       # Certificate issuer configuration
 │   └── keycloak.yaml           # Keycloak Helm values
-└── docs/                       # Documentation and tutorials
-    ├── scenarios/              # Different OIDC/OAuth2 scenarios
-    ├── enterprise/             # Enterprise integration guides
-    └── api/                    # API documentation
 ```
 
 ## 📚 Learning Scenarios
@@ -152,6 +175,7 @@ Default Keycloak configuration includes:
 - Admin user: `admin` / `admin123`
 - Demo realm: `devopsbeerer`
 - Pre-configured clients for each application
+- Demo users: `brewmaster` (admin) and `customer` (user) with password `beer123`
 
 ### Modifying Applications
 
@@ -195,6 +219,9 @@ sudo k3s kubectl get nodes -o wide
 # Check cert-manager logs
 sudo k3s kubectl logs -n cert-manager deployment/cert-manager
 sudo k3s kubectl get certificates --all-namespaces
+
+# Note: Self-signed certificates will show browser warnings - this is expected
+# Click "Advanced" → "Proceed to site" to continue
 ```
 
 **Keycloak not accessible**
