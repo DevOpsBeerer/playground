@@ -35,7 +35,7 @@ spec:
           - name: single-request-reopen
           - name: no-tld-query
       containers:
-        - image: rg.fr-par.scw.cloud/devopsbeerer/api:1.2.3
+        - image: rg.fr-par.scw.cloud/devopsbeerer/api:1.0.0
           imagePullPolicy: Always
           name: api
           securityContext:
@@ -75,6 +75,22 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "sleep 15"]
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
       # Graceful termination
       terminationGracePeriodSeconds: 30
 
