@@ -24,4 +24,4 @@ spec:
               service:
                 name: devopsbeerer-frontoffice
                 port:
-                  number: 80
+                  number: 8080
