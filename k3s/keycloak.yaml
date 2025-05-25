@@ -112,15 +112,17 @@ keycloakConfigCli:
             - "http://localhost:4200/*"
           attributes:
             "pkce.code.challenge.method": "S256"
+            "post.logout.redirect.uris": "http://localhost:4200##https://app.devopsbeerer.local"
           defaultClientScopes:
-            - Beers.Read
-            - Beers.Read.All
             - web-origins
             - acr
             - roles
             - profile
             - basic
             - email
+          optionalClientScopes:
+            - Beers.Read
+            - Beers.Read.All
         
         # Backend API (Confidential)
         - clientId: "devopsbeerer-api"

@@ -16,9 +16,16 @@ data:
     {
         "authority": "https://sso.devopsbeerer.local/realms/devopsbeerer",
         "redirectUrl": "https://app.devopsbeerer.local/callback",
-        "postLogoutRedirectUri": "https://app.devopsbeerer.local:4200",
+        "postLogoutRedirectUri": "https://app.devopsbeerer.local",
         "clientId": "devopsbeerer-frontoffice",
         "secureRoutes": [
             "https://api.devopsbeerer.local/"
+        ],
+        "scopes": [
+            "openid",
+            "profile",
+            "email",
+            "Beers.Read.All",
+            "Beers.Read"
         ]
     }
