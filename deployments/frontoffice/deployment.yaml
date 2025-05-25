@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       dnsPolicy: ClusterFirst
       containers:
-        - image: rg.fr-par.scw.cloud/devopsbeerer/frontoffice:1.0.0
+        - image: rg.fr-par.scw.cloud/devopsbeerer/frontoffice:2.0.0
           imagePullPolicy: Always
           name: frontoffice
           securityContext:
