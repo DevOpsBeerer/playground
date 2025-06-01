@@ -31,6 +31,13 @@ helm --kubeconfig $KUBECONFIG upgrade --install sso oci://registry-1.docker.io/b
     --create-namespace \
     -f k3s/keycloak.yaml
 
+## Install operator
+helm --kubeconfig $KUBECONFIG upgrade --install devopsbeerer-operator oci://rg.fr-par.scw.cloud/devopsbeerer/charts/devopsbeerer-operator \
+    --namespace devopsbeerer-operator \
+    --create-namespace
+
+sleep 10
+
 ## Install dashboard
 helm --kubeconfig $KUBECONFIG upgrade --install devopsbeerer-dashboard oci://rg.fr-par.scw.cloud/devopsbeerer/charts/devopsbeerer-dashboard \
     --namespace devopsbeerer-dashboard \
